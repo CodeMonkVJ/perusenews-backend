@@ -1,0 +1,16 @@
+Title: Menu Score: How we cracked the Menu Code (and you can too!)
+Image: https://zomatoblog.com/wp-content/uploads/2024/04/image.png
+URL: /menu-score-how-we-cracked-the-menu-code-and-you-can-too
+
+Title: Hackoween: Elevating cybersecurity resilience at Zomato through competitive challenges
+Image: https://zomatoblog.com/wp-content/uploads/2024/04/Hackoween.png
+URL: /hackoween-elevating-cybersecurity-resilience-at-zomato-through-competitive-challenges
+
+Title: A Tale of Scale: Behind the Scenes at Zomato Tech for NYE 2023
+Image: https://zomatoblog.com/wp-content/uploads/2024/02/blog-cover3x.jpg
+URL: /a-tale-of-scale-behind-the-scenes-at-zomato-tech-for-nye-2023
+
+Title: Unlocking performance, scalability, and cost-efficiency of Zomato’s Billing Platform by switching from TiDB to DynamoDB
+Image: https://zomatoblog.com/wp-content/uploads/2024/01/blog-cover.png
+URL: /switching-from-tidb-to-dynamodb
+
