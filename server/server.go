@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"time"
 
+    "github.com/gorilla/mux"
 	"github.com/CodeMonkVJ/perusenews/server/handlers"
 )
 
@@ -15,8 +16,18 @@ func main() {
     l := log.New(os.Stdout, "perusenews-api", log.LstdFlags)
     wh := handlers.NewWebsites(l)
     
-    sm := http.NewServeMux()
-    sm.Handle("/", wh)
+    sm := mux.NewRouter()
+
+    getRouter := sm.Methods(http.MethodGet).Subrouter()
+    getRouter.HandleFunc("/", wh.GetWebsites)
+
+    putRouter := sm.Methods(http.MethodPut).Subrouter()
+    putRouter.HandleFunc("/{id:[0-9]+}", wh.UpdateWebsite)
+    putRouter.Use(wh.MiddlewareWebsiteValidation)
+
+    postRouter := sm.Methods(http.MethodPost).Subrouter()
+    postRouter.HandleFunc("/", wh.AddWebsite)
+    postRouter.Use(wh.MiddlewareWebsiteValidation)
     
     s := &http.Server{
         Addr: ":9090",

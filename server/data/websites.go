@@ -6,15 +6,18 @@ import (
 	"io"
 	"log"
 	"math/rand"
+	"regexp"
 	"time"
+
+	"github.com/go-playground/validator"
 )
 
 type Website struct {
     ID int
-    UserID int `json:"userID"`
-    Name string `json:"name"`
-    URL string `json:"url"`
-    ScriptLink string `json:"scriptLink"`
+    UserID int `json:"userID" validate:"required"`
+    Name string `json:"name" validate:"required"`
+    URL string `json:"url" validate:"required"`
+    ScriptLink string `json:"scriptLink" validate:"required,script"`
     CreatedOn string `json:"-"`
     UpdatedOn string `json:"-"`
     DeletedOn string `json:"-"`
@@ -23,6 +26,22 @@ type Website struct {
 func (w *Website) FromJSON(r io.Reader) error {
     e := json.NewDecoder(r)
     return e.Decode(w)
+}
+
+func (w *Website) Validate() error {
+    validate := validator.New()
+    err := validate.RegisterValidation("script", validateScript)
+    if err != nil {
+        return err    
+    }
+    return validate.Struct(w)
+}
+
+func validateScript(fl validator.FieldLevel) bool {
+    re := regexp.MustCompile(`^https:\/\/utfs\.io\/f\/[a-z0-9-.]+$`)
+    matches := re.FindAllString(fl.Field().String(), -1)
+
+    return len(matches) == 1 
 }
 
 type Websites []*Website
