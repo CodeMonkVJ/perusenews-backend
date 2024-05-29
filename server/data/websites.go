@@ -1,87 +1,101 @@
 package data
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"log"
 	"math/rand"
-	"regexp"
 	"time"
-
-	"github.com/go-playground/validator"
 )
 
+//Website defines the structure for an API website
+// swagger:model
 type Website struct {
-    ID int
-    UserID int `json:"userID" validate:"required"`
+    // the id of the website
+    //
+    // required: false
+    // min: 1
+    ID int `json:"id"`
+
+    // the id of the user it belongs to
+    //
+    // required: true
+    // min: 1
+    UserID int `json:"userID" validate:"required,gt=0"`
+    
+    // name of the Website
+    //
+    // required: true
+    // max length: 50
     Name string `json:"name" validate:"required"`
+    
+    // url of the Website
+    //
+    // required: true
     URL string `json:"url" validate:"required"`
+    
+    // link of script for fetching website articles
+    //
+    // required: true
     ScriptLink string `json:"scriptLink" validate:"required,script"`
+    
     CreatedOn string `json:"-"`
+    
     UpdatedOn string `json:"-"`
+    
     DeletedOn string `json:"-"`
 }
 
-func (w *Website) FromJSON(r io.Reader) error {
-    e := json.NewDecoder(r)
-    return e.Decode(w)
-}
-
-func (w *Website) Validate() error {
-    validate := validator.New()
-    err := validate.RegisterValidation("script", validateScript)
-    if err != nil {
-        return err    
-    }
-    return validate.Struct(w)
-}
-
-func validateScript(fl validator.FieldLevel) bool {
-    re := regexp.MustCompile(`^https:\/\/utfs\.io\/f\/[a-z0-9-.]+$`)
-    matches := re.FindAllString(fl.Field().String(), -1)
-
-    return len(matches) == 1 
-}
-
 type Websites []*Website
-
-func (w *Websites) ToJSON(wr io.Writer) error {
-    e := json.NewEncoder(wr)
-    return e.Encode(w)
-}
 
 func GetWebsites() Websites {
     return websiteList
 }
 
-func AddWebsite(w *Website) {
-    w.ID = rand.Int()
-    websiteList = append(websiteList, w)
+func GetWebsiteByID(id int) (*Website, error) {
+    i := findWebsiteByID(id)
+    if i == -1 {
+        return nil, ErrorWebsiteNotFound
+    }
+
+    return websiteList[i], nil
 }
 
-func UpdateWebsite(id int, w *Website) error {
-    pos, err := findWebsite(id)
-    if err != nil {
-        return err
+func AddWebsite(w Website) {
+    w.ID = rand.Int()
+    websiteList = append(websiteList, &w)
+}
+
+func UpdateWebsite(w Website) error {
+    pos := findWebsiteByID(w.ID)
+    if pos == -1 {
+        return ErrorWebsiteNotFound
     }
     
-    log.Println("found website with id ", id)
-    w.ID = id
-    websiteList[pos] = w
+    websiteList[pos] = &w
+    
+    return nil
+}
+
+func DeleteWebsite(id int) error {
+    pos := findWebsiteByID(id)
+    if pos == -1 {
+        return ErrorWebsiteNotFound
+    }
+
+    websiteList = append(websiteList[:pos], websiteList[pos+1])
+
     return nil
 }
 
 var ErrorWebsiteNotFound = fmt.Errorf("Website not found")
 
-func findWebsite(id int) (int, error) {
+func findWebsiteByID(id int) int {
     for i, w := range websiteList {
         if w.ID == id {
-            return i, nil
+            return i
         }
     }
 
-    return -1, ErrorWebsiteNotFound
+    return -1
 }
 
 var websiteList = []*Website{
