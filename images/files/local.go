@@ -46,6 +46,10 @@ func (l *Local) Save(path string, contents io.Reader) error {
     if err != nil {
         return xerrors.Errorf("Unable to create file: %w", err)
     }
+    //_, err = f.Seek(0,io.SeekStart)
+    //if err != nil {
+    //    return xerrors.Errorf("Unable to rewind file pointer: %w", err)
+    //}
     defer f.Close()
 
     _, err = io.Copy(f, contents)

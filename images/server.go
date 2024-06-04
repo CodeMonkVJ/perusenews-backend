@@ -32,6 +32,7 @@ func main() {
     }
 
     fh := handlers.NewFiles(stor, l)
+    mw := handlers.GzipHandler{}
 
     sm := mux.NewRouter()
 
@@ -46,6 +47,7 @@ func main() {
         "/images/{id:[0-9]+}/{filename:[a-zA-Z]+\\.[a-z]{3}}",
         http.StripPrefix("/images/", http.FileServer(http.Dir("./imagestore"))),
     )
+    gh.Use(mw.GzipMiddlware)
 
     s := http.Server{
         Addr: ":9090",
